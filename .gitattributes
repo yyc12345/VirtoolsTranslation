@@ -1,2 +1,3 @@
-*.fods        eol=lf
+NlpSrc/*.txt    text eol=crlf
+NlpSrc/*.nlp    binary
 
