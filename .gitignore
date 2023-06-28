@@ -1,6 +1,10 @@
 ## my ban
 out/
 temp/
+NlpParser/*
+!NlpParser/Nlp.g4
+!NlpParser/testbench.txt
+!NlpParser/compile.bat
 
 .vscode/
 
