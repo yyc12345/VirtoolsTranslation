@@ -1,14 +1,14 @@
 grammar Nlp;
 
-nlp_document: LANG_HEADER (section)* ;
+document: LANG_HEADER (section)* ;
 
-section: SECTION_HEAD (sub_section | entry)* ;
+section: SECTION_HEAD (subSection | entry)* ;
 
-sub_section: SUB_SECTION_HEAD (entry)* ;
+subSection: SUB_SECTION_HEAD (entry)* ;
 
-entry: ENTRY_STRING                             # entry_string_t
-| ENTRY_STRING (LINE_CONCAT ENTRY_STRING)+      # entry_concated_string_t
-| ENTRY_INTEGER                                 # entry_integer_t
+entry: ENTRY_STRING                             # entryString
+| ENTRY_STRING (LINE_CONCAT ENTRY_STRING)+      # entryConcatedString
+| ENTRY_INTEGER                                 # entryInteger
 ;
 
 LANG_HEADER: 'Language:' [a-zA-Z]+ ;
