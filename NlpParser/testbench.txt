@@ -56,3 +56,6 @@ bar"
 
 "foo""\\\
 ""bar"
+
+"foo\n\
+bar"

@@ -37,8 +37,11 @@ public class NlpRunner {
 		
 		/* String related stuff */
 		
-		private static final Pattern mRegStrCctor = Pattern.compile("\\\\[^\\r\\n]*[\\r\\n]+");
+		// \\\\[^\\rn] match the concator. concator must not be appended with \n \r or \\ 
+		// [^\\r\\n]*[\\r\\n]+ is match to line breaker.
+		private static final Pattern mRegStrCctor = Pattern.compile("\\\\[^\\\\rn][^\\r\\n]*[\\r\\n]+");
 		private static final Pattern mRegDoubleQuote = Pattern.compile("\\\"\\\"");
+		private static final Pattern mRegEscSlash = Pattern.compile("\\\\\\\\");
 		private static final Pattern mRegEscTab = Pattern.compile("\\t");
 		private static final Pattern mRegEscEol = Pattern.compile("\\r?\\n");
 		private String cutLangHead(String strl) {
@@ -51,10 +54,11 @@ public class NlpRunner {
 			return strl.substring(1, strl.length() - 1);
 		}
 		private String regulateString(String strl) {
-			strl = mRegStrCctor.matcher(strl).replaceAll(Matcher.quoteReplacement(""));		// remove string concator \\[^\r\n]*[\r\n]+
+			strl = mRegStrCctor.matcher(strl).replaceAll(Matcher.quoteReplacement(""));		// remove string concator
 			strl = mRegDoubleQuote.matcher(strl).replaceAll(Matcher.quoteReplacement("\""));// replace "" with "
-			strl = mRegEscTab.matcher(strl).replaceAll(Matcher.quoteReplacement("\\t"));	// replace real \t to escape char
-			strl = mRegEscEol.matcher(strl).replaceAll(Matcher.quoteReplacement("\\n"));	// replace all real \n to escape char
+			strl = mRegEscSlash.matcher(strl).replaceAll(Matcher.quoteReplacement("\\"));	// replace real escape to escape char
+			strl = mRegEscTab.matcher(strl).replaceAll(Matcher.quoteReplacement("\\t"));
+			strl = mRegEscEol.matcher(strl).replaceAll(Matcher.quoteReplacement("\\n"));
 			
 			return strl;			
 		}
