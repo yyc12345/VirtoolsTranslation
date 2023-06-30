@@ -1,11 +1,13 @@
 ## my ban
 out/
 temp/
+NlpSrc/*
+!NlpSrc/*.nlp
 NlpParser/*
 !NlpParser/Nlp.g4
 !NlpParser/NlpRunner.java
 !NlpParser/testbench.txt
-!NlpParser/compile.bat
+!NlpParser/README.md
 
 .vscode/
 

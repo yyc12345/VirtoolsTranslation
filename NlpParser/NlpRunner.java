@@ -14,6 +14,11 @@ import com.google.gson.GsonBuilder;
 // import regex
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+// import io related
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 public class NlpRunner {
 	public static class NlpJsonConverter extends NlpBaseListener {
@@ -26,8 +31,8 @@ public class NlpRunner {
 		/* JSON related stuff */
 		
 		Gson mGsonInstance;
-		public void printJson() {
-			System.out.print(mGsonInstance.toJson(mRoot));;
+		public String buildJsonString() {
+			return mGsonInstance.toJson(mRoot);
 		}
 		
 		/* String related stuff */
@@ -137,17 +142,54 @@ public class NlpRunner {
 		}
 	}
 	
+	private static void printHelp() {
+		System.out.println("NlpRunner <src> <dest>");
+		System.out.println();
+		System.out.println("<src> - the decoded nlp text file.");
+		System.out.println("<dest> - the output json file.");
+	}
+	
 	public static void main(String[] args) throws Exception {
-		ANTLRInputStream input = new ANTLRInputStream(System.in);
+		// check parameter
+		if (args.length != 2) {
+			System.out.println("[ERR] Invalid arguments!");
+			printHelp();
+			System.exit(1);
+		}
+		
+		// open file stream
+		FileInputStream fin = null;
+		FileOutputStream fout = null;
+		try {
+			fin = new FileInputStream(args[0]);
+			fout = new FileOutputStream(args[1]);
+		} catch (Exception e) {
+			if (fin != null) fin.close();
+			if (fout != null) fout.close();
+			
+			System.out.println("[ERR] Fail to open file!");
+			printHelp();
+			System.exit(1);
+		}
+
+		// start lex and parse
+		CharStream input = CharStreams.fromStream(fin, StandardCharsets.UTF_8);
 		NlpLexer lexer = new NlpLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		NlpParser parser = new NlpParser(tokens);
 		
+		// walk tree to build json
 		ParseTree tree = parser.document();
 		ParseTreeWalker walker = new ParseTreeWalker();
 		NlpJsonConverter converter = new NlpJsonConverter();
 		walker.walk(converter, tree);
-		converter.printJson();
-		System.out.println();
+		
+		// write json
+		OutputStreamWriter fw = new OutputStreamWriter(fout, StandardCharsets.UTF_8);
+		fw.write(converter.buildJsonString());
+		
+		// close file stream
+		fin.close();
+		fw.close();
 	}
 }
