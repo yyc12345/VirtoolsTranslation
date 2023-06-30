@@ -1,71 +1,58 @@
 Language:English
 
 /*
-			----===[[[[ Virtools Language Pack File ]]]]===----
-
-   Rules:
-   First line must contain the string 'Language:' followed by the language name.
-   The file may be seen as sections, each section name is enclosed in brackets ([,])
-   Sections can have sub-sections, with names enclosed in brackets (<,>)
-   For every section or sub-section, you can have as many entries as you want,
-   which can be:	- strings (optionaly enclosed in quotes)
-			- numbers
-   Separators for entries are ',',';' or LF (line feed)
-   Entries belong to the last section or sub-section specified, until
-   a new section is reached. The first entry of the section has an index of 0,
-   the next one, an index of 1, and so on.
-   Comments can be added using the standard ANSI C++ scheme.
-   Also, dont remove %s,%d and %f tags, those will be replaced at runtime by strings or numbers.
-   A string can take multiple lines, adding \ at the end of the line means that the entry
-   continues on the next line.
-
-   NOTE FOR TRANSLATORS: DO NOT CHANGE ENTRIES ORDER IN THIS FILE!!!
-
+long comments
 */
 
-[Version]  
-"Virtools Dev","Virtools Crea"
-"Virtools Dev Evaluation","Virtools Crea Evaluation"
-"Virtools Dev Education","Virtools Crea Education"
+// short comments
 
+[Layout 0]
 
-[Profiler]
-"Profiler"
+"entry 0"
 
-"Database","Framerate","Objects Drawn","Faces Drawn","Lines Drawn"
-"Behavior Code Execution Details...","Collisions Management","Parametric Operations",
-"IK","Floors Management","Other Code"
+<layout 0 0>
+"Virtools Dev1","Virtools Dev2"
+"Virtools Dev3"
+"Virtools Dev1","Virtools Dev2",
+"Virtools Dev3"
 
-[Common]
+<layout 0 1>
+"Virtools Dev"
 
-"MultiSelection"
+[Layout 1]
 
-// -- DONT CHANGE THIS
+<layout 1 0>
+<layout 1 1>
 
-<Registry>
-"Software\\Virtools\\Global","Usage Count"
+[String Escape]
 
-<Timebomb>
-"Key1","Key2","Key3","SYSINFO.SysInfo32\\CLSID","\\csrsrv32.dll"
+<String Escape 0>
 
-// -- ENDOF DONT CHANGE
+"foo bar"
+"\\foo\tbar\n"
+"foo	barr	"
+"\\""foo""\t""bar"""
 
-<Timebomb Messages>
-"Your license has expired.\n\nYou must either stop evaluating Virtools or\nextend it by clicking the 'Extend' button and following the instructions.\n\nAlso, check out our web resources for more information:"
-"- Main Web Site","- Virtools mailing list, additional resources, discussions and more."
-"Customer Key:","Check Key:"
-"HOWTO:\n\t- A new customer key will be generated.\n\t- Send it by e-mail to our support service at:  support@Virtools.com\n"\
-"\t  You will receive back a valid check key according to your customer key.\n\t- Copy/Paste the key into corresponding field above.\n"\
-"\t- Your license will be extended to as many days as specified in your agreement.\n\n"\
-"WARNING: Once generated, the customer key is valid for 5 days only."
+<String Escape 1>
 
+"foo"\      // short comments
+"bar"
 
-[3D Layout]
-"3D Layout"
+"foo\       // short comments
+bar"
 
-<Names>
-"New 3D Frame","New 2D Frame","New Camera","New Light","New Curve","New Grid","New Material","New Texture","New Portal"
- 
-<Actions>
-"--- Out of range ---"
-"%s '%s' created." // on creation (ie. TargetLight 'light0000' created.)
+"foo"\      // short comments
+"bar"\      // short comments
+"bar"
+
+"foo\       // short comments
+bar\        // short comments
+bar"
+
+<String Escape 2>
+
+"foo""\\"\
+"""bar"
+
+"foo""\\\
+""bar"
