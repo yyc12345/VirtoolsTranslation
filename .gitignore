@@ -3,6 +3,7 @@ out/
 temp/
 NlpSrc/*
 !NlpSrc/*.nlp
+!NlpSrc/README.md
 NlpParser/*
 !NlpParser/Nlp.g4
 !NlpParser/NlpRunner.java
