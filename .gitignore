@@ -9,6 +9,7 @@ NlpParser/*
 !NlpParser/NlpRunner.java
 !NlpParser/testbench.txt
 !NlpParser/README.md
+NlpTr/*
 
 .vscode/
 
