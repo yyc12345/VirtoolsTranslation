@@ -3,6 +3,13 @@ import collections
 import io
 import json
 
+g_VirtoolsVersion: tuple[str] = (
+    '25', '35', '40', '50',
+)
+g_SupportedLangs: tuple[str] = (
+    'zh-cn', 
+)
+
 def DumpJson(filepath: str, jsonData: dict):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(jsonData, f, indent=4, sort_keys=False)
@@ -60,7 +67,7 @@ def LoadTrDiff(filepath: str) -> dict:
 
 # return a tuple. (insertedKey, deletedKey, insertedVal)
 def SeperatePlainJsonDiff(diffData: dict) -> tuple:
-    insertedKey: list[str] = []
+    insertedKey: list[int] = []
     insertedVal: list[str] = []
 
     if jsondiff.insert in diffData:
@@ -75,14 +82,28 @@ def SeperatePlainJsonDiff(diffData: dict) -> tuple:
 
     return (insertedKey, deletedKey, insertedVal)
 
+def CombinePlainJsonDiff(insertedKey: list[int], deletedKey: list[int], insertedVal: list[str]) -> dict:
+    assert len(insertedKey) == len(insertedVal)
+
+    result: dict = {}
+    if len(insertedKey) != 0:
+        result[jsondiff.insert] = []
+    for k, v in zip(insertedKey, insertedVal):
+        result[jsondiff.insert].append((k, v))
+    
+    if len(deletedKey) != 0:
+        result[jsondiff.delete] = deletedKey[:]
+
+    return result
+
 # return a tuple. (keyList, valueList)
-def NlpJson2PlainJsonWrapper(nlpJson: dict) -> tuple:
+def NlpJson2PlainJson(nlpJson: dict) -> tuple:
     keyList: list[str] = []
     valueList: list[str] = []
     stack: collections.deque = collections.deque()
-    NlpJson2PlainJson(nlpJson, stack, keyList, valueList)
+    InternalNlpJson2PlainJson(nlpJson, stack, keyList, valueList)
     return (keyList, valueList, )
-def NlpJson2PlainJson(nlpJson: dict, stack: collections.deque, keyList: list[str], valueList: list[str]):
+def InternalNlpJson2PlainJson(nlpJson: dict, stack: collections.deque, keyList: list[str], valueList: list[str]):
     assert isinstance(nlpJson, dict)
     assert 'entries' in nlpJson
 
@@ -97,6 +118,6 @@ def NlpJson2PlainJson(nlpJson: dict, stack: collections.deque, keyList: list[str
             # is a sub section
             # push section name and recursive calling this function
             stack.append(entry['section'])
-            NlpJson2PlainJson(entry, stack, keyList, valueList)
+            InternalNlpJson2PlainJson(entry, stack, keyList, valueList)
             stack.pop()
 

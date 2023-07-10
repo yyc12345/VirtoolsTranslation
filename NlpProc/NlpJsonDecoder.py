@@ -1,34 +1,25 @@
 import NlpUtils
 import jsondiff
-import sys, collections
+import collections
 
-CmdArgvPair = collections.namedtuple('CmdArgvPair', ('nlpJson', 'trTemplate', 'trDiff', 'trIndex'))
-def CmdArgvAnalyzer() -> tuple[CmdArgvPair]:
-    ls: list[CmdArgvPair] = []
+VtTrDataTuple = collections.namedtuple('VtTrDataTuple', ('nlpJson', 'trTemplate', 'trDiff', 'trIndex'))
+def ConstructVtTrDataTuple() -> tuple[VtTrDataTuple]:
+    return tuple(VtTrDataTuple._make((
+        f'../NlpSrc/VT{i}.json',
+        f'../NlpTr/VT{i}.template.json',
+        f'../NlpTr/VT{i}.diff',
+        f'../NlpTr/VT{i}.index',
+    ))for i in NlpUtils.g_VirtoolsVersion)
 
-    argc = len(sys.argv) - 1
-    if argc % 4 != 0:
-        print("invalid parameter.")
-        sys.exit(1)
-
-    count = argc // 4
-    return tuple(CmdArgvPair._make(sys.argv[1 + i * 4:5 + i * 4]) for i in range(count))
-
-# script will order 1 file as reference
-# 0. the nlp json file
-# script will output 3 files for each version translation.
-# 0. translation template json
-# 0. the diff result comparing with the previous version
-# 0. a list including the key of each value in template json
-# so for a single version virtools, we need input 4 arguments
 if __name__ == "__main__":
-    resolvedArgv = CmdArgvAnalyzer()
 
     prevJson = None
-    for vtVer in resolvedArgv:
+    for vtVer in ConstructVtTrDataTuple():
+        print(f'Processing {vtVer.nlpJson}...')
+
         # read nlp json and convert it into plain json
         nlpJson = NlpUtils.LoadJson(vtVer.nlpJson)
-        (plainKeys, plainValues, ) = NlpUtils.NlpJson2PlainJsonWrapper(nlpJson)
+        (plainKeys, plainValues, ) = NlpUtils.NlpJson2PlainJson(nlpJson)
 
         # write index file
         NlpUtils.DumpTrIndex(vtVer.trIndex, plainKeys)
@@ -48,7 +39,7 @@ if __name__ == "__main__":
             # write diff
             NlpUtils.DumpTrDiff(vtVer.trDiff, insertedKey, deletedKey)
             # write template with special treat
-            NlpUtils.DumpTrTemplate(vtVer.trTemplate, dict((i, j) for i, j in enumerate(insertedVal)))
+            NlpUtils.DumpTrTemplate(vtVer.trTemplate, dict((plainKeys[insertedKey[i]], insertedVal[i]) for i in range(len(insertedKey))))
 
         # assign prev json
         prevJson = plainValues
