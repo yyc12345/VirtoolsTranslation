@@ -2,6 +2,7 @@ import jsondiff
 import collections
 import io
 import json
+import re
 
 g_VirtoolsVersion: tuple[str] = (
     '25', '35', '40', '50',
@@ -40,7 +41,7 @@ def DumpTrTemplate(filepath: str, templateData: dict[str, str]):
 def LoadTrTemplate(filepath: str) ->  dict[str, str]:
     return LoadJson(filepath)
 
-def DumpTrDiff(filepath: str, insertedKey: list[str], deletedKey: list[str]):
+def DumpTrDiff(filepath: str, insertedKey: list[int], deletedKey: list[int]):
     with open(filepath, 'w', encoding='utf-8') as f:
         for entryIdx in insertedKey:
             f.write(f'i/{entryIdx}\n')
@@ -49,9 +50,9 @@ def DumpTrDiff(filepath: str, insertedKey: list[str], deletedKey: list[str]):
             f.write(f'd/{entryIdx}\n')
 
 # return a tuple. (insertedKey, deletedKey)
-def LoadTrDiff(filepath: str) -> dict:
-    insertedKey: list[str] = []
-    deletedKey: list[str] = []
+def LoadTrDiff(filepath: str) -> tuple:
+    insertedKey: list[int] = []
+    deletedKey: list[int] = []
     with open(filepath, 'r', encoding='utf-8') as f:
         while True:
             ln = f.readline()
@@ -59,9 +60,9 @@ def LoadTrDiff(filepath: str) -> dict:
 
             sp = ln.strip('\n').split('/')
             if sp[0] == 'i':
-                insertedKey.append(sp[1])
+                insertedKey.append(int(sp[1]))
             else:
-                deletedKey.append(sp[1])
+                deletedKey.append(int(sp[1]))
 
     return (insertedKey, deletedKey)
 
@@ -120,4 +121,82 @@ def InternalNlpJson2PlainJson(nlpJson: dict, stack: collections.deque, keyList: 
             stack.append(entry['section'])
             InternalNlpJson2PlainJson(entry, stack, keyList, valueList)
             stack.pop()
+
+def PlainJson2NlpJson(keyList: list[str], valueList: list[str]) -> dict:
+    # create the base section
+    # each section will have 3 k-v pair. language/section and entities are existed in original nlp json
+    # and key_map is served for path finding and convenient for looking for sub section.
+    result: dict = {
+        "language": "English",
+        "entities": [],
+        "key_map": {}
+    }
+    # inerate list and construct dict
+    for k, v in zip(keyList, valueList):
+        InternalPlainJson2NlpJson(result, k, v)
+    return result
+def InternalPlainJson2NlpJson(nlpJson: dict, pairKey: str, pairVal: str):
+    keypath = pairKey.split('/')
+    # confirm last node is number and remove it
+    assert keypath[-1].isdecimal()
+    keypath = keypath[0:-1]
+
+    # move to correct sub section
+    for pathpart in keypath:
+        if pathpart in nlpJson['key_map']:
+            # existed sub section. directly entering
+            nlpJson = nlpJson['key_map'][pathpart]
+        else:
+            # create a new one
+            sub_section = {
+                'section': pathpart,
+                'entities': [],
+                'key_map': {}
+            }
+
+            # add into current section
+            nlpJson['entities'].append(sub_section)
+            nlpJson['key_map'][pathpart] = sub_section
+
+            # move to the new created sub section
+            nlpJson = sub_section
+
+    # insert data
+    nlpJson['entities'].append(pairVal)
+
+
+
+def DumpNlpJson(filepath: str, encoding: str, lang_macro: str, nlpJson: dict):
+    # write in wb mode because we need explicitly write \r\n, not \n
+    with open(filepath, 'wb') as f:
+        f.write(f'Language:{lang_macro}\r\n'.encode(encoding, errors='ignore'))
+        InternalDumpNlpJson(f, encoding, 0, nlpJson)
+
+g_NlpJsonStrRepl1 = re.compile('\\\\')
+g_NlpJsonStrRepl2 = re.compile('\"')
+def NlpJsonStringProcessor(strl: str) -> str:
+    return g_NlpJsonStrRepl2.sub('\"\"', strl)
+
+def InternalDumpNlpJson(f: io.BufferedWriter, encoding: str, depth: int, nlpJson: dict):
+    assert 'entities' in nlpJson
+
+    is_first: bool = True
+    for entity in nlpJson['entities']:
+        if isinstance(entity, str):
+            # write comma if not the first element
+            if not is_first: f.write(','.encode(encoding))
+            else: is_first = False
+
+            # write real data
+            # replace all " to "" to escape
+            f.write('"{0}"'.format(NlpJsonStringProcessor(entity)).encode(encoding, errors='ignore'))
+        else:
+            # sub section
+            # write section header and call self.
+            if depth == 0:
+                f.write(f'\r\n[{entity["section"]}]\r\n'.encode(encoding, errors='ignore'))
+            else:
+                f.write(f'\r\n<{entity["section"]}>\r\n'.encode(encoding, errors='ignore'))
+
+            InternalDumpNlpJson(f, encoding, depth + 1, entity)
 

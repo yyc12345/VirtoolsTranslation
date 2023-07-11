@@ -3,12 +3,12 @@ import jsondiff
 import collections
 
 g_SupportedEncoding = {
-    'zh-cn': ('utf-8', 'gb2312', )
+    'zh-cn': ('Chinese', ('utf-8', 'gb2312', ), )
 }
 
 VtTrDataTuple = collections.namedtuple('VtTrDataTuple', ('rawNlp', 'trTemplate', 'trDiff', 'trIndex'))
-def GetRawNlpPath(ver: str, lang: str) -> str:
-    return f'../NlpTr/out/VT{ver}.{lang}.txt'
+def GetRawNlpPath(ver: str, lang: str, enc: str) -> str:
+    return f'../NlpTr/out/VT{ver}.{lang}.{enc}.txt'
 def GetTrPath(ver: str, lang: str) -> str:
     return f'../NlpTr/VT{ver}.{lang}.json'
 def GetTrDiffPath(ver: str) -> str:
@@ -18,16 +18,52 @@ def GetTrIndexPath(ver: str) -> str:
 
 if __name__ == "__main__":
 
+    # load each version's diff data and patch data for conventient using
+    PreLoadedDiffIdxTuple = collections.namedtuple('PreLoadedDiffIndexTuple', ('insertedKey', 'deletedKey', 'plainKeys'))
+    preLoadedData: dict[str, PreLoadedDiffIdxTuple] = {}
     for ver in NlpUtils.g_VirtoolsVersion:
         # load diff and index data
+        insertedKey, deletedKey = NlpUtils.LoadTrDiff(GetTrDiffPath(ver))
+        plainKeys = NlpUtils.LoadTrIndex(GetTrIndexPath(ver))
+        # insert to dict
+        preLoadedData[ver] = PreLoadedDiffIdxTuple._make((insertedKey, deletedKey, plainKeys))
 
-        for lang in NlpUtils.g_SupportedLangs:
+    # iterate lang first
+    # because we use progressive patch. we need iterate vt ver in order
+    for lang in NlpUtils.g_SupportedLangs:
+        
+        prevPlainValues: list[str] = None
+        for ver in NlpUtils.g_VirtoolsVersion:
+            print(f'Processing {ver}.{lang}...')
+
+            # pick data from pre-loaded dict
+            diffIdxData = preLoadedData[ver]
+
             # load lang file
+            # and only keeps its value.
+            trFull = NlpUtils.LoadTrTemplate(GetTrPath(ver, lang))
+            _, plainValues = zip(*trFull.items())
 
-            # patch it
+            # patch it if needed
+            if prevPlainValues is not None:
+                # patch needed load
+                # load patch part first
+                trPart = NlpUtils.LoadTrTemplate(GetTrPath(ver, lang))
 
-            # convert plain json to nested json
+                # re-construct the diff structure understood by jsondiff
+                cmpResult = NlpUtils.CombinePlainJsonDiff(diffIdxData.insertedKey, diffIdxData.deletedKey, plainValues)
+
+                # patch data
+                plainValues = jsondiff.patch(prevPlainValues, cmpResult)
+
+            # convert plain json to nlp json
+            nlpJson = NlpUtils.PlainJson2NlpJson(plainKeys, plainValues)
 
             # write into file with different encoding
-            for enc in g_SupportedEncoding[lang]:
-                print(f'Process {ver}.{lang}.{enc}...')
+            lang_macro, encs = g_SupportedEncoding[lang]
+            for enc in encs:
+                print(f'Processing {ver}.{lang}.{enc}...')
+                NlpUtils.DumpNlpJson(GetRawNlpPath(ver, lang, enc), enc, lang_macro, nlpJson)
+
+            # assign prev json
+            prevPlainValues = plainValues

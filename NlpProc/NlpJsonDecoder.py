@@ -13,7 +13,7 @@ def ConstructVtTrDataTuple() -> tuple[VtTrDataTuple]:
 
 if __name__ == "__main__":
 
-    prevJson = None
+    prevPlainValues = None
     for vtVer in ConstructVtTrDataTuple():
         print(f'Processing {vtVer.nlpJson}...')
 
@@ -25,14 +25,14 @@ if __name__ == "__main__":
         NlpUtils.DumpTrIndex(vtVer.trIndex, plainKeys)
 
         # compare with previous one
-        if prevJson is None:
+        if prevPlainValues is None:
             # this is first json. omit diff
             # write blank diff and write whole translation values
             NlpUtils.DumpTrDiff(vtVer.trDiff, [], [])
             NlpUtils.DumpTrTemplate(vtVer.trTemplate, dict(zip(plainKeys, plainValues)))
         else:
             # compare with prev json
-            cmpResult = jsondiff.diff(prevJson, plainValues)
+            cmpResult = jsondiff.diff(prevPlainValues, plainValues)
             # seperate diff result
             (insertedKey, deletedKey, insertedVal) = NlpUtils.SeperatePlainJsonDiff(cmpResult)
 
@@ -42,5 +42,5 @@ if __name__ == "__main__":
             NlpUtils.DumpTrTemplate(vtVer.trTemplate, dict((plainKeys[insertedKey[i]], insertedVal[i]) for i in range(len(insertedKey))))
 
         # assign prev json
-        prevJson = plainValues
+        prevPlainValues = plainValues
 
