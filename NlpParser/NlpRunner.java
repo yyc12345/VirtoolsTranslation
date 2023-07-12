@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 public class NlpRunner {
 	public static class NlpJsonConverter extends NlpBaseListener {
 		public NlpJsonConverter() {
-			mGsonInstance = new GsonBuilder().setPrettyPrinting().create();
+			mGsonInstance = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 			mRoot = new JsonObject();
 			mSection = new JsonArray();
 			mSectionStack = new Stack<JsonArray>();

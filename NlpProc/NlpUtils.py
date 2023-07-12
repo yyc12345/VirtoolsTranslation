@@ -4,20 +4,30 @@ import io
 import json
 import re
 
-g_EnableDebugging = False
+g_EnableDebugging = True
 
 g_VirtoolsVersion: tuple[str] = (
     '25', '35', '40', '50',
 )
-g_SupportedLangs: tuple[str] = (
-    'zh-cn', 
-)
+
+if g_EnableDebugging:
+    g_SupportedLangs: tuple[str] = (
+        'template', 
+    )
+else:
+    g_SupportedLangs: tuple[str] = (
+        'zh-cn', 
+    )
 
 # ========== Basic File RW Functions ==========
 
 def DumpJson(filepath: str, jsonData: dict):
     with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(jsonData, f, indent=(2 if g_EnableDebugging else None), sort_keys=False)
+        json.dump(jsonData, f, 
+            indent=(2 if g_EnableDebugging else None), 
+            sort_keys=False,
+            ensure_ascii=False
+        )
 
 def LoadJson(filepath: str) -> dict:
     with open(filepath, 'r', encoding='utf-8') as f:

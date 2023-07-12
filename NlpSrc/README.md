@@ -2,5 +2,5 @@
 
 Useful comparing differences command:
 
-`diff -u VT25.json VT50.json`
-`diff -u VT25.txt VT50.txt`
+`diff -u --strip-trailing-cr VT25.json VT50.json`
+`diff -u --strip-trailing-cr VT25.txt VT50.txt`

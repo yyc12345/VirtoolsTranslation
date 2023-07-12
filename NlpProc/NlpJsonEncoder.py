@@ -2,11 +2,18 @@ import NlpUtils
 import jsondiff
 import collections
 
-g_SupportedEncoding = {
-    'zh-cn': ('Chinese', ('utf-8', 'gb2312', ), )
-}
+if NlpUtils.g_EnableDebugging:
+    g_SupportedEncoding = {
+        'template': ('English', ('ascii', ), )
+    }
+else:
+    g_SupportedEncoding = {
+        'zh-cn': ('Chinese', ('utf-8', 'gb2312', ), )
+    }
 
 VtTrDataTuple = collections.namedtuple('VtTrDataTuple', ('rawNlp', 'trTemplate', 'trDiff', 'trIndex'))
+def GetNlpJsonPath(ver: str, lang: str) -> str:
+    return f'../NlpTr/out/VT{ver}.{lang}.json'
 def GetRawNlpPath(ver: str, lang: str, enc: str) -> str:
     return f'../NlpTr/out/VT{ver}.{lang}.{enc}.txt'
 def GetTrPath(ver: str, lang: str) -> str:
@@ -60,7 +67,8 @@ if __name__ == "__main__":
             # convert plain json to nlp json
             nlpJson = NlpUtils.PlainJson2NlpJson(plainKeys, plainValues)
 
-            NlpUtils.DumpJson(GetRawNlpPath(ver, lang, '')[:-5] + '.json', nlpJson)
+            if NlpUtils.g_EnableDebugging:
+                NlpUtils.DumpJson(GetNlpJsonPath(ver, lang), nlpJson)
 
             # write into file with different encoding
             lang_macro, encs = g_SupportedEncoding[lang]
