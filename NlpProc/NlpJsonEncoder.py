@@ -38,6 +38,7 @@ if __name__ == "__main__":
 
             # pick data from pre-loaded dict
             diffIdxData = preLoadedData[ver]
+            plainKeys = diffIdxData.plainKeys
 
             # load lang file
             # and only keeps its value.
@@ -58,6 +59,8 @@ if __name__ == "__main__":
 
             # convert plain json to nlp json
             nlpJson = NlpUtils.PlainJson2NlpJson(plainKeys, plainValues)
+
+            NlpUtils.DumpJson(GetRawNlpPath(ver, lang, '')[:-5] + '.json', nlpJson)
 
             # write into file with different encoding
             lang_macro, encs = g_SupportedEncoding[lang]

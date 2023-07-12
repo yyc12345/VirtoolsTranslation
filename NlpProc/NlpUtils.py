@@ -4,6 +4,8 @@ import io
 import json
 import re
 
+g_EnableDebugging = False
+
 g_VirtoolsVersion: tuple[str] = (
     '25', '35', '40', '50',
 )
@@ -11,9 +13,11 @@ g_SupportedLangs: tuple[str] = (
     'zh-cn', 
 )
 
+# ========== Basic File RW Functions ==========
+
 def DumpJson(filepath: str, jsonData: dict):
     with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(jsonData, f, indent=4, sort_keys=False)
+        json.dump(jsonData, f, indent=(2 if g_EnableDebugging else None), sort_keys=False)
 
 def LoadJson(filepath: str) -> dict:
     with open(filepath, 'r', encoding='utf-8') as f:
@@ -122,24 +126,34 @@ def InternalNlpJson2PlainJson(nlpJson: dict, stack: collections.deque, keyList: 
             InternalNlpJson2PlainJson(entry, stack, keyList, valueList)
             stack.pop()
 
+# ========== Json Converter ==========
+
 def PlainJson2NlpJson(keyList: list[str], valueList: list[str]) -> dict:
     # create the base section
-    # each section will have 3 k-v pair. language/section and entities are existed in original nlp json
+    # each section will have 3 k-v pair. language/section and entries are existed in original nlp json
     # and key_map is served for path finding and convenient for looking for sub section.
     result: dict = {
         "language": "English",
-        "entities": [],
+        "entries": [],
         "key_map": {}
     }
     # inerate list and construct dict
     for k, v in zip(keyList, valueList):
         InternalPlainJson2NlpJson(result, k, v)
+    # remove useless key map
+    InternalDelNlpJsonKeyMap(result)
     return result
+def InternalDelNlpJsonKeyMap(nlpJson: dict):
+    # recursively calling self
+    for v in nlpJson['key_map'].values():
+        InternalDelNlpJsonKeyMap(v)
+    # then delete self
+    del nlpJson['key_map']
 def InternalPlainJson2NlpJson(nlpJson: dict, pairKey: str, pairVal: str):
     keypath = pairKey.split('/')
     # confirm last node is number and remove it
     assert keypath[-1].isdecimal()
-    keypath = keypath[0:-1]
+    keypath = keypath[:-1]
 
     # move to correct sub section
     for pathpart in keypath:
@@ -150,21 +164,21 @@ def InternalPlainJson2NlpJson(nlpJson: dict, pairKey: str, pairVal: str):
             # create a new one
             sub_section = {
                 'section': pathpart,
-                'entities': [],
+                'entries': [],
                 'key_map': {}
             }
 
             # add into current section
-            nlpJson['entities'].append(sub_section)
+            nlpJson['entries'].append(sub_section)
             nlpJson['key_map'][pathpart] = sub_section
 
             # move to the new created sub section
             nlpJson = sub_section
 
     # insert data
-    nlpJson['entities'].append(pairVal)
+    nlpJson['entries'].append(pairVal)
 
-
+# ========== Raw Nlp Text Writer ==========
 
 def DumpNlpJson(filepath: str, encoding: str, lang_macro: str, nlpJson: dict):
     # write in wb mode because we need explicitly write \r\n, not \n
@@ -172,16 +186,16 @@ def DumpNlpJson(filepath: str, encoding: str, lang_macro: str, nlpJson: dict):
         f.write(f'Language:{lang_macro}\r\n'.encode(encoding, errors='ignore'))
         InternalDumpNlpJson(f, encoding, 0, nlpJson)
 
-g_NlpJsonStrRepl1 = re.compile('\\\\')
+# g_NlpJsonStrRepl1 = re.compile('\\\\')
 g_NlpJsonStrRepl2 = re.compile('\"')
 def NlpJsonStringProcessor(strl: str) -> str:
     return g_NlpJsonStrRepl2.sub('\"\"', strl)
 
 def InternalDumpNlpJson(f: io.BufferedWriter, encoding: str, depth: int, nlpJson: dict):
-    assert 'entities' in nlpJson
+    assert 'entries' in nlpJson
 
     is_first: bool = True
-    for entity in nlpJson['entities']:
+    for entity in nlpJson['entries']:
         if isinstance(entity, str):
             # write comma if not the first element
             if not is_first: f.write(','.encode(encoding))
