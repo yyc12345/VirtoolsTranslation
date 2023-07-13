@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 public class NlpRunner {
 	public static class NlpJsonConverter extends NlpBaseListener {
@@ -177,7 +178,7 @@ public class NlpRunner {
 		}
 
 		// start lex and parse
-		CharStream input = CharStreams.fromStream(fin, StandardCharsets.UTF_8);
+		CharStream input = CharStreams.fromStream(fin, Charset.forName("windows-1252"));
 		NlpLexer lexer = new NlpLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		NlpParser parser = new NlpParser(tokens);

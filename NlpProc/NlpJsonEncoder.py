@@ -4,7 +4,7 @@ import collections
 
 if NlpUtils.g_EnableDebugging:
     g_SupportedEncoding = {
-        'template': ('English', ('ascii', ), )
+        'template': ('English', ('windows-1252', ), )
     }
 else:
     g_SupportedEncoding = {
@@ -36,12 +36,12 @@ if __name__ == "__main__":
         preLoadedData[ver] = PreLoadedDiffIdxTuple._make((insertedKey, deletedKey, plainKeys))
 
     # iterate lang first
-    # because we use progressive patch. we need iterate vt ver in order
+    # because we use progressive patch. we need iterate vt ver in order for each single languages
     for lang in NlpUtils.g_SupportedLangs:
         
         prevPlainValues: list[str] = None
         for ver in NlpUtils.g_VirtoolsVersion:
-            print(f'Processing {ver}.{lang}...')
+            print(f'Loading {ver}.{lang}...')
 
             # pick data from pre-loaded dict
             diffIdxData = preLoadedData[ver]

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <memory>
 
-namespace NlpEncoder {
+namespace NlpCodec {
 
     constexpr const uint8_t g_XorArray[] {
         0x2C, 0xA8, 0x56, 0xF9, 0xBD, 0xA6, 0x8D, 0x15, 0x25, 0x38, 0x1A, 0xD4, 0x65, 0x58, 0x28, 0x37,
@@ -176,11 +176,11 @@ namespace NlpEncoder {
 }
 
 static void PrintHelp(void) {
-    fputs("NlpEncoder Usage\n", stdout);
+    fputs("NlpCodec Usage\n", stdout);
     fputs("\n", stdout);
-    fputs("NlpEncoder [compress | uncompress] <src> <dest>\n", stdout);
-    fputs("compress - compress text file into nlp file.\n", stdout);
-    fputs("uncompress - decompress nlp file into text file.\n", stdout);
+    fputs("NlpCodec [encode | decode] <src> <dest>\n", stdout);
+    fputs("encode - encode text file into nlp file.\n", stdout);
+    fputs("decode - decompress nlp file into text file.\n", stdout);
     fputs("<src> - the source file. text file in compress mode. nlp file in uncompress mode.\n", stdout);
     fputs("<dest> - the destination file. nlp file in compress mode. text file in uncompress mode.\n", stdout);
 }
@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string mode(argv[1]);
-    if (mode != "compress" && mode != "uncompress") {
+    if (mode != "encode" && mode != "decode") {
         fputs("[ERR] Unknow operation!\n", stdout);
         PrintHelp();
         return 1;
@@ -214,10 +214,10 @@ int main(int argc, char* argv[]) {
 
     // do real work
     bool result = true;
-    if (mode == "compress") {
-        result = NlpEncoder::EncodeNlp(infile, outfile);
+    if (mode == "encode") {
+        result = NlpCodec::EncodeNlp(infile, outfile);
     } else {
-        result = NlpEncoder::DecodeNlp(infile, outfile);
+        result = NlpCodec::DecodeNlp(infile, outfile);
     }
 
     // free resources and report

@@ -4,7 +4,7 @@ import io
 import json
 import re
 
-g_EnableDebugging = True
+g_EnableDebugging = False
 
 g_VirtoolsVersion: tuple[str] = (
     '25', '35', '40', '50',
