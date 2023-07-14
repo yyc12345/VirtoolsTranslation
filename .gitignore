@@ -10,6 +10,10 @@ NlpParser/*
 !NlpParser/testbench.txt
 !NlpParser/README.md
 NlpTr/*
+!NlpTr/*.diff
+!NlpTr/*.index
+!NlpTr/*.json
+!NlpTr/README.md
 
 .vscode/
 

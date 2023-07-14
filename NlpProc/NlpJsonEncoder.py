@@ -23,6 +23,39 @@ def GetTrDiffPath(ver: str) -> str:
 def GetTrIndexPath(ver: str) -> str:
     return f'../NlpTr/VT{ver}.index'
 
+g_CriticalFields: dict[str, str] = {
+    'Common/Registry/0': 'Software\\\\Virtools\\\\Global',
+    'Common/Registry/1': 'Usage Count',
+    'Common/Timebomb/0': 'Key1',
+    'Common/Timebomb/1': 'Key2',
+    'Common/Timebomb/2': 'Key3',
+    'Common/Timebomb/3': 'SYSINFO.SysInfo32\\\\CLSID',
+    'Common/Timebomb/4': '\\\\csrsrv32.dll',
+    '3D Layout/Registry/0': 'Software\\\\NeMo\\\\3D Layout',
+}
+def CriticalFieldChecker(nlpJson: dict):
+    corrected: bool = False
+    for k, v in g_CriticalFields.items():
+        # analyze path and find the node
+        path = k.split('/')
+        assert path[-1].isdecimal()
+        path_terminal = int(path[-1])
+        path = path[:-1]
+
+        node = nlpJson
+        for pathpart in path:
+            node = node['key_map'][pathpart]
+
+        # check it
+        if node['entries'][path_terminal] != v:
+            # if not matched. correct it
+            node['entries'][path_terminal] = v
+            # and notify it
+            corrected = True
+
+    if corrected:
+        print('Some critical filed was changed in tr by accident. We have corrected them, but please check tr carefully')
+
 if __name__ == "__main__":
 
     # load each version's diff data and patch data for conventient using
@@ -66,8 +99,11 @@ if __name__ == "__main__":
 
             # convert plain json to nlp json
             nlpJson = NlpUtils.PlainJson2NlpJson(plainKeys, plainValues)
+            # check some critical fields
+            CriticalFieldChecker(nlpJson)
 
             if NlpUtils.g_EnableDebugging:
+                NlpUtils.RemoveKeyMapInGeneratedNlpJson(nlpJson)
                 NlpUtils.DumpJson(GetNlpJsonPath(ver, lang), nlpJson)
 
             # write into file with different encoding

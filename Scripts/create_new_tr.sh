@@ -5,6 +5,7 @@ then
     echo ""
     echo "./create_new_tr.sh <lang-symbol>"
     echo "<lang-symbol>: your preferred language symbol. such as en, de, zh-cn..."
+    exit 1
 fi
 
 cd NlpTr

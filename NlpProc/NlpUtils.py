@@ -24,7 +24,7 @@ else:
 def DumpJson(filepath: str, jsonData: dict):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(jsonData, f, 
-            indent=(2 if g_EnableDebugging else None), 
+            indent=2, 
             sort_keys=False,
             ensure_ascii=False
         )
@@ -150,9 +150,11 @@ def PlainJson2NlpJson(keyList: list[str], valueList: list[str]) -> dict:
     # inerate list and construct dict
     for k, v in zip(keyList, valueList):
         InternalPlainJson2NlpJson(result, k, v)
-    # remove useless key map
-    InternalDelNlpJsonKeyMap(result)
     return result
+def RemoveKeyMapInGeneratedNlpJson(nlpJson: dict) -> dict:
+    # remove useless key map
+    InternalDelNlpJsonKeyMap(nlpJson)
+    return nlpJson
 def InternalDelNlpJsonKeyMap(nlpJson: dict):
     # recursively calling self
     for v in nlpJson['key_map'].values():
