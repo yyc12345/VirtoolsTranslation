@@ -1,0 +1,23 @@
+{
+  "Schematic/Popup/11": "Sort By Activity",
+  "3D Object Setup/Buttons/3": "Use Hardware Skinning",
+  "3D Object Setup/Buttons/4": "Bones Mode",
+  "3D Object Setup/Bones Mode/0": "Local",
+  "3D Object Setup/Bones Mode/1": "World",
+  "3D Object Setup/Bones Mode/2": "World View",
+  "3D Object Setup/Bones Mode/3": "World View Proj",
+  "3D Object Setup/Bones Info/0": "Bones Count",
+  "3D Object Setup/Bones Info/1": "Max. Bones per Vertex",
+  "Mesh Setup/Buttons/20": "Material / Channel Type",
+  "Mesh Setup/Popup Menu/3": "Fill With...",
+  "Hierarchy View/Errors/3": "A place can only be a 3D root!",
+  "TextureType/0": "2d",
+  "TextureType/1": "Cube",
+  "TextureType/2": "Volume",
+  "Channel Extended/0": "Add Extended Channel",
+  "Channel Extended/1": "Float 1",
+  "Channel Extended/2": "Float 2",
+  "Channel Extended/3": "Float 3",
+  "Channel Extended/4": "Float 4",
+  "Channel Extended/5": "Channel Type..."
+}

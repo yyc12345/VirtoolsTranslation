@@ -7,7 +7,7 @@ import re
 g_EnableDebugging = False
 
 g_VirtoolsVersion: tuple[str] = (
-    '25', '35', '40', '50',
+    '25', '30', '35', '40', '50',
 )
 
 if g_EnableDebugging:

@@ -1,0 +1,23 @@
+{
+  "Schematic/Popup/11": "按活动排序",
+  "3D Object Setup/Buttons/3": "使用硬件蒙皮",
+  "3D Object Setup/Buttons/4": "骨骼模式",
+  "3D Object Setup/Bones Mode/0": "本地",
+  "3D Object Setup/Bones Mode/1": "世界",
+  "3D Object Setup/Bones Mode/2": "世界视图",
+  "3D Object Setup/Bones Mode/3": "世界视图投影",
+  "3D Object Setup/Bones Info/0": "骨骼数量",
+  "3D Object Setup/Bones Info/1": "每个顶点的最大骨骼数",
+  "Mesh Setup/Buttons/20": "材质 / 通道类型",
+  "Mesh Setup/Popup Menu/3": "填充...",
+  "Hierarchy View/Errors/3": "一个位置只能是一个3D根!",
+  "TextureType/0": "2d",
+  "TextureType/1": "Cube",
+  "TextureType/2": "Volume",
+  "Channel Extended/0": "添加扩展通道",
+  "Channel Extended/1": "浮点数1",
+  "Channel Extended/2": "浮点数2",
+  "Channel Extended/3": "浮点数3",
+  "Channel Extended/4": "浮点数4",
+  "Channel Extended/5": "通道类型..."
+}
