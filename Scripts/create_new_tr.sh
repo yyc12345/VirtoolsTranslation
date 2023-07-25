@@ -10,6 +10,7 @@ fi
 
 cd NlpTr
 cp VT25.template.json "VT25."$1".json"
+cp VT30.template.json "VT30."$1".json"
 cp VT35.template.json "VT35."$1".json"
 cp VT40.template.json "VT40."$1".json"
 cp VT50.template.json "VT50."$1".json"

@@ -15,6 +15,7 @@ This repository consist of these parts:
 I take `zh-cn` (Chinese) as a example. Navigate to NlpTr folder first. and you will find following files.
 
 * `VT25.zh-cn.json`
+* `VT30.zh-cn.json`
 * `VT35.zh-cn.json`
 * `VT40.zh-cn.json`
 * `VT50.zh-cn.json`

@@ -14,3 +14,4 @@ do
 		../../NlpCodec/out/NlpCodec encode $txt_file $nlp_file
 	fi
 done
+cd ../..
