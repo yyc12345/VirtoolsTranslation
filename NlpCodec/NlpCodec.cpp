@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
 
     std::string mode(argv[1]);
     if (mode != "encode" && mode != "decode") {
-        fputs("[ERR] Unknow operation!\n", stdout);
+        fputs("[ERR] Unknown operation!\n", stdout);
         PrintHelp();
         return 1;
     }
